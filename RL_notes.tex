@@ -1,0 +1,481 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4,fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage{array,booktabs}
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amssymb,amsfonts,amsthm} % Math packages
+\usepackage{mathrsfs}
+\usepackage{dsfont}
+
+% index stuff
+\usepackage{imakeidx}
+\makeindex[columns=3, title=Alphabetical Index]
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+% \pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{\thepage} % Page numbering for center footer
+\fancyfoot[R]{} %  Empty right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+\newcommand{\eqdef}{\stackrel{\text{def}}{=}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+%=====================================================================================
+%	TITLE SECTION
+%=====================================================================================
+
+\title{	
+    \normalfont \normalsize 
+    % \textsc{Udacity, Reinforcement Learning} \\ [25pt] % Your university, school and/or department name(s)
+    \horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+    \huge Notes on Reinforcement Learning \\ % The assignment title
+    \horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+\author{Jose Marcos Rodr\'iguez Fern\'andez} % Your name
+\date{\normalsize\today} % Today's date or a custom date
+
+
+%=====================================================================================
+%	DOCUMENT BODY
+%=====================================================================================
+
+\begin{document}
+
+\tableofcontents % Print the table of contents
+\maketitle % Print the title
+
+%-------------------------------------------------------------------------------------
+%	The Reinforcement Learning Problem
+%-------------------------------------------------------------------------------------
+\newpage
+\section{The Reinforcement Learning Problem}
+
+Reinforcement Learning is simultaneously a problem, a class of solution methods 
+that work well for some class of problems, and the field that studies these problems.
+We explore a computational approach focused on goal-directed learning from interaction, 
+more specifically, an approach in which an agent interacts with the environment and learns
+actions as to maximize a numerical reward signal.
+
+
+%-------------------------------------------------------------------------------
+%	Markov Decision Processes (MDPs)
+%-------------------------------------------------------------------------------
+\subsection{MDP: Markov Decision Processes}
+
+A reinforcement learning task that satisfies the Markov property is called a
+Markov decision process, or MDP.
+
+A particular finite MDP is defined by its state and action sets and by the
+one-step dynamics of the environment. Given any state and action $s$ and $a$,
+the probability of each possible pair of next state and reward, $s'$, $r$ is denoted by:
+
+\begin{align}
+    p(s',r | s,a) = Pr\{ S_{t+1}=s', R_{t+1}=r | S_t=s, A_t=a  \}
+\end{align}
+
+Given these dynamics we can compute the following aspects of the MDP:
+
+\begin{enumerate}
+    \item Expected rewards for the state-actions pairs:
+    \begin{align}
+        r(s, a) = \mathbb{E} [ R_{t+1} | S_t=s, A_t=a ] =
+        \sum_{r \in \mathbb{R}} r \sum_{s' \in \mathbb{S}} p(s',r|s, a)
+    \end{align}
+    
+    \item State-transition probabilities:
+    \begin{align}
+        T(s'|s,a) = Pr\{S_{t+1}=s'|S_t=s, A_t=a\} =
+        \sum_{r \in \mathbb{R}} = p(s',r|s,a)
+    \end{align}
+    
+    \item Expected rewards for state-action-next-state triples:
+    \begin{align}
+        r(s, a, s') = \mathbb{E} [ R_{t+1} | S_t=s, A_t=a, S_{t+1}=s' ] =
+        \frac{\sum_{r \in \mathbb{R}} rp(s',r|s,a)}{p(s'|s,a)}
+    \end{align}
+\end{enumerate}
+
+% FINITE MARKOV DECISION PROCESSES
+\subsubsection{Finite Markov Decision Processes}
+
+We can think of two different kind of RL tasks:
+
+\begin{itemize}
+    \item \textbf{Episodic tasks}: 
+    Tasks in which the problem breaks naturally into episodes, 
+    hence dealing only with a finite number of steps and rewards within an episode.
+    
+    \item \textbf{Continuing tasks}: These tasks do not have a clear boundary and require dealing with a possibly infinite number of steps and rewards.
+\end{itemize}
+
+\textit{Episodic tasks} might require a special notation as we deal with time-steps
+inside an episode. For that case we would talk about a \textit{state representation}
+at time $t$ in episode $i$: $S_{t, i}$.
+
+Similarly: $A_{t, i}, R_{t, i}, \pi_{t, i}, T_{t, i}$ for 
+\textit{Actions, Rewards, Policies and Transition rules} respectively. \\
+
+In order to find a unified notation for both \textit{episodic} and \textit{continuing}
+tasks, we can effectively drop the episode index as we will rarely consider the
+dynamics across episodes. \\
+
+Nevertheless, in the \textit{episodic} task we perform a summation over a finite
+number of rewards, whilst in the \textit{continuing} we add over a infinite number
+of reward steps. To solve this we can consider that episode termination is done
+by entering into an \textbf{absorbing final state} which only transitions to itself
+and always yields a zero reward.
+
+
+
+% VALUE FUNCTIONS
+\subsubsection{Value Functions}
+
+Almost all reinforcement learning algorithms involve estimating 
+value functions-functions of states (or of state-action pairs) that estimate how good it
+is for the agent to be in a given state (or how good it is to perform a given
+action in a given state). "How good" here is defined in terms of future rewards that can be expected, or, to be precise, in terms of expected return.
+
+The agent's behaviour is determined by a \textbf{policy}.
+A policy $\pi$ is a mapping from each state, $s \in \mathbb{S}$ and action $a \in \mathbb{A}(s)$ to the probability $\pi(a|s)$ of taking
+action $a$ when in state $s$. \\
+
+\subsubsection{State-Value function}
+The value of a state $s$ under a policy $\pi$ is the expected return
+when starting at state $s$ and following policy $\pi$:
+
+\begin{align}
+    v_{\pi}(s) = \mathbb{E}_{\pi} \left[ G_t | S_t=s \right] = 
+    \mathbb{E}_{\pi} \left[ \sum_{k=0}^{\infty} \gamma^k R_{t+k+1} | S_t=s \right]
+    \label{eq:value_function}
+\end{align}
+
+\subsubsection{Action-Value function}
+Similarly, we define the value of taking action $a$ in state $s$ under a policy
+$\pi$ as the expected return starting from state $s$ taking action $a$
+and then following policy $\pi$:
+
+\begin{align}
+    q_{\pi}(s, a) = \mathbb{E}_{\pi} \left[ G_t | S_t=s, A_t=a \right] = 
+    \mathbb{E}_{\pi} \left[ \sum_{k=0}^{\infty} \gamma^k R_{t+k+1} | S_t=s, A_t=a \right]
+    \label{eq:action-value_function}
+\end{align}
+
+
+% BELLMAN EQUATIONS
+\subsection{Bellman Equations}
+
+When solving Markov Decision Processes (\textit{MDPs}), we model the world with a set $\{S,A,T,R,\gamma\}$, 
+States, Actions, Transition probabilities or Transition model, Rewards and a discounting reward factor.
+To measure how good is to be in a particular state $s$ we talk about the Value, a discounted infinite sum of
+expected rewards from the state \textit{s}: $V(s) = \mathbb{E} \left[ \sum_{0}^{\inf} \gamma^t r_t \right]$.
+
+This takes us to the \textit{Value Iteration} where the key idea is to use the \textit{Bellman Recursion}
+which relates the current state with the expected value of the next state.
+
+The \textit{Bellman Recursion} is defined as: $V(s) = R(s) + \gamma \sum_{s'} P(s'|s) V(s') $.
+Bringing actions into the equation yields equation \ref{eq:Bellman_value}.
+As shown later on, these equations will serve as the base for finding 
+optimal policies of actions in an \textit{MDP}.
+
+\begin{align}
+    % Bellman Value equation
+    V(s) &= \max_a R(s,a) + \gamma \sum_{s'} T(s,a,a') \cdot V(s') 
+    \label{eq:Bellman_value} \\	
+    % Bellman quality equation
+    Q(s,a) &= R(s,a) + \gamma \sum_{s'} T(a,s,a') \max_{a'} Q(s',a') 
+    \label{eq:Bellman_quality} \\
+    % Bellman continuity equation
+    C(s,a) &= \gamma \sum_{s'} T(s,a,a') \max_{a'} (R(s',a') + C(s',a')) 
+    \label{Bellman_continuity}
+\end{align}
+
+Where:
+\begin{itemize}
+	\item $R(s,a)$ is the Reward function at state \textit{s}
+    \item $T(s,a,s')$ is the Transition function: probability of going 
+    	from state \textit{s} to \textit{s'} taking action \textit{a}
+    \item $\gamma$ is the discount factor
+	\item $V(s)$ stands for Value function at state \textit{s}
+    \item $Q(s,a)$ stands for Quality function at state \textit{s} taking action \textit{a}
+    \item $C(s,a)$ stands for Continuity function at state \textit{s} taking action \textit{a}
+\end{itemize}
+
+Pending to discuss what $Q(s,a)$ is, basically for now; allow us to
+perform \textit{Value Iteration} without look ahead. As we can see all 
+three equations are mathematically equivalent in table 
+\ref{tab:Bellman_equiv}
+
+
+% EQUIVALENCE BETWEEN BELLMAN EQUATIONS
+\subsubsection{Equivalence and relations}
+
+Bellman's Value and Quality functions:
+
+\begin{table}[h]
+  	\begin{center}
+      \caption{Equivalence table between Bellman Equations}
+      \label{tab:Bellman_equiv}
+      \begin{tabular}{| >{\centering\arraybackslash}m{0.15in} | 
+      					>{\centering\arraybackslash}m{1.9in} | 
+                        >{\centering\arraybackslash}m{1.9in} | 
+                        >{\centering\arraybackslash}m{1.5in} |}
+      \hline
+        & \textbf{V} & \textbf{Q} & \textbf{C} \\ \hline
+      \hline
+          V &  
+          $V(s)=V(s)$  &  
+          $V(s)=\max_a Q(s,a)$  &  
+          $V(s)=\max_a(R(s,a) + C(s,a)$ \\ 
+      \hline
+          Q &  
+          $\begin{aligned}[t]
+              Q(s,a)&=\\R(s,a)+\gamma\sum_{s'}&T(s,a,s')V(s) &
+          \end{aligned}$ & 
+          $Q(s,a)=Q(s,a)$ &
+          $ Q(s,a)=R(s,a)+C(s,a) $ \\
+      \hline
+          C &
+          $\begin{aligned}[t]
+              C(s,a)&=\\\gamma\sum_{s'}&T(s,a,s')V(s')
+          \end{aligned}$ &
+          $\begin{aligned}[t]
+              C(s,a)&=\\\gamma\sum_{s'}&T(a,s,a')\max_{a'}Q(s',a')
+          \end{aligned}$ &
+          $C(s,a)=C(s,a)$ \\ 
+      \hline
+      \end{tabular}
+    \end{center}
+\end{table}
+
+
+%--------------------------------------------------------------------------------
+%	NOTES on chapter 1: Tabular methods
+%--------------------------------------------------------------------------------
+
+% TABULAR METHODS
+\section{Tabular methods}
+
+Tabular methods are the most basic form of algorithms in Reinforcement Learning. 
+These methods are suitable for problems in which the \textit{State} and \textit{Value} functions
+are small enough to fit in arrays or tables.
+\newline
+
+\textit{\textbf{def:} K-Armed Bandit Problem}: \newline
+K different options or actions are given. Each action has an associated numeric reward drawn from a
+stationary probability distribution that depends on the selected action.
+The objective is to maximize the total expected reward over some period of time.
+
+
+% Action-Value methods
+\subsubsection{Action-Value Methods}
+
+A simple method to estimate the value of an action, let's say, in the above K-Armed Bandit problem, is to 
+calculate the mean observed reward after an action is taken.
+
+\begin{align}
+Q_t(a) \eqdef \frac{\sum_{i=1}^{t-1} R_i \mathds{1}_{A_i=a}}{\sum_{i=1}^{t-1} \mathds{1}_{A_i=a}}	\label{eq:value function}
+\end{align}
+
+Where $ \mathds{1}_{predicate} $ denotes the random variable that is 1 if \textit{predicate} is true
+and 0 otherwise.
+
+Therefore the simplest action-selection rule is:
+\begin{align}
+A_t \eqdef \argmax_a Q_t(a)
+\end{align}
+
+Selecting always the action that maximizes the expected reward is called a \textit{\textbf{greedy action selection}}.
+This exploits the \textit{current knowledge} and \textit{maximizes immediate reward}.
+
+A simple alternative to behave greedily all the time is to select randomly between all the possible actions with 
+probability $\epsilon$.
+This is called \textit{\textbf{$\epsilon$-greedy}} selection.
+An advantage of this method is that allows for \textit{exploration} and \textit{exploitation}. In the limit
+every action will be sampled an infinite number of times, ensuring that all $Q_t(a)$ converge to $q_*(a)$ 
+\footnote{If the probability of selecting the optimal action converges to greater than $1 - \epsilon$}.
+
+
+% Incremental approach
+\subsubsection{Incremental approach}
+A direct implementation of the above \textit{action-value} estimation method would require storing all rewards over
+time for all possible actions and computing the average at every time-step.
+
+One might realize that this can be avoided by calculating the \textit{Q-values} as follows 
+\footnote{Unfolding equation \ref{eq:value function} to the incremental form should be easy enough and skipped here for brevity}:
+\begin{align}
+Q_{n+1} = Q_n + \frac{1}{n} \left[ R_n - Q_n \right]	\label{eq:update-rule}
+\end{align}
+
+This is a common \textit{update rule} whose general form is:
+\begin{align*}
+NewEstimate \leftarrow OldEstimate + EstepSize \left[ Target - OldEstimate \right]
+\end{align*}
+
+% Non-stationary problems
+\subsubsection{Non stationary problems}
+In the above sections we assumed an underlying stationary environment. In an K-Armed Bandit problem where 
+the bandit changes over time makes sense to weight recent rewards more heavily than long-past ones.
+
+From equation \eqref{eq:update-rule} we can device a weighted average form:
+\begin{align}
+Q_{n+1} \eqdef (1 - \alpha)^n Q_1 + \sum_{i=1}^n \alpha (1-\alpha)^{n-i} R_i
+\end{align}
+
+
+% Gradient Bandit Problems
+\subsubsection{Gradient Based Algorithms}
+Another common approach is to learn a numerical preference for each action: $H_t(a)$.
+The larger the \textit{preference} the more often an action is taken. The \textit{preference} absolute value is of no
+importance, only the relative \textit{preference} between action is relevant.
+
+Action probabilities are then determined according to a \textit{soft-max} distribution.
+(i.e., \hyperlink{https://en.wikipedia.org/wiki/Boltzmann_distribution}{Gibbs or Boltzmann distribution}):
+
+\begin{align}
+Pr \left\lbrace A_t=a \right\rbrace \eqdef \frac{ e^{H_t(a)} }{ \sum_{b=1}^k e^{H_t(b)} } \eqdef \pi_t(a)
+\end{align}
+
+Where $ \pi_t(a) $ is the probability of taking action $a$ at time $t$.
+
+Then a natural learning algorithm based on \textit{stochastic gradient ascent} is as follows:
+\begin{equation}
+	\begin{aligned}
+		H_{t+1} \eqdef H_t(A_t) + \alpha (R_t - \overline{R}_t) (1 - \pi_t(A_t)) \\
+        H_{t+1} \eqdef H_t(a) - \alpha (R_t - \overline{R}_t) \pi_t(a), 	
+        \forall a \neq A_t
+	\end{aligned}
+\end{equation}
+
+Where $\alpha$ is the step-size parameter and $\overline{R}_t \in \mathbb{R}$ is the average rewards up to time $t$, 
+also called \textit{baseline}.
+
+The above equation uses the \textit{baseline} to compare against rewards. If a given reward is higher than the
+baseline then the \textit{preference} is incremented for that \textit{action} and decreased for all other \textit{actions}.
+\footnote{For an elaboration of the Bandit Gradient Algorithm as Stochastic Gradient Ascent see chapter 2.7 of 'An introduction to Reinforcement Learning - Sutton and Barto'}
+
+% Associative Search
+\subsubsection{Associative Search}
+The above algorithms try to find the best possible action when the environment is stationary or tries to track the best
+action as it changes over time in a non-stationary environment. However a more general case is to try to find the best possible
+action in a given situation.
+In the jargon of Reinforcement Learning this is known as learning a \textit{policy}, 
+a function mapping from \textit{states} to \textit{actions}.
+
+In other words, the task to solve is not only fining the best action, or in the
+non-stationary setup, tracking the best action over time, but to find the
+best action for a given state, hence associate a given state to its best action.
+
+% DYNAMIC PROGRAMMING
+\subsection{DYNAMIC PROGRAMMING}
+
+% Policy Evaluation
+\subsubsection{Policy Evaluation}
+
+This is to compute the \textit{state-value function} $v_\pi$. 
+Also called the \textit{prediction problem}.
+
+\begin{equation}
+    \begin{aligned}
+        v_\pi(s) = \mathbb{E_\pi} \left[ 
+            R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t = s
+        \right] = \\ 
+        \mathbb{E_\pi} \left[ 
+            R_{t+1} + \gamma v_\pi(s_{t+1}) | S_t = s
+        \right] = \\
+        \sum_a \pi(a|s) \sum_{s',r} p(s',r|s, a) \left[ r + \gamma v_\pi(s') \right]
+    \end{aligned}
+    \label{eq:policy-evaluation}
+\end{equation}
+
+If the dynamics of the environment are fully known, then \ref{eq:policy-evaluation}
+is a system of $|\mathbb{S}|$ equations in $|\mathbb{S}|$ unknowns and therefore
+a straightforward computation. Nevertheless, in general iterative methods are more 
+suitable to solve this kind of problem.
+
+% Policy Improvement
+\subsubsection{Policy Improvement}
+
+% Policy Iteration
+\subsubsection{Policy Iteration}
+
+% Value Iteration
+\subsubsection{Value Iteration}
+
+
+
+%--------------------------------------------------------------------------------
+%	NOTES on chapter 2: Approximate Solution Methods
+%--------------------------------------------------------------------------------
+
+\section{Approximate Solution Methods}
+
+% ON-POLICY APPROXIMATION
+\subsection{On-policy approximation}
+
+% OFF-POLICY APPROXIMATION
+\subsection{Off-policy approximation}
+
+% POLICY APPROXIMATION
+\subsection{Policy approximation}
+
+%% Actor Critic methods
+\subsubsection{Actor Critic Methods (Ac3)}
+
+
+%--------------------------------------------------------------------------------
+%	NOTES on chapter 2: Frontiers
+%--------------------------------------------------------------------------------
+
+\section{Frontiers}
+
+
+\printindex
+\end{document}
