@@ -20,13 +20,18 @@
 
 \documentclass[paper=a4,fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
 
+% Use the Adobe Utopia font for the document
 \usepackage{array,booktabs}
-\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
-\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage{fourier} % comment this line to return to the LaTeX default
 \usepackage[english]{babel} % English language/hyphenation
-\usepackage{amsmath,amssymb,amsfonts,amsthm} % Math packages
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+
+% Math packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm} 
 \usepackage{mathrsfs}
 \usepackage{dsfont}
+% Algorithms
+\usepackage[ruled,vlined]{algorithm2e}
 
 % index stuff
 \usepackage{imakeidx}
@@ -436,7 +441,27 @@ Also called the \textit{prediction problem}.
 If the dynamics of the environment are fully known, then \ref{eq:policy-evaluation}
 is a system of $|\mathbb{S}|$ equations in $|\mathbb{S}|$ unknowns and therefore
 a straightforward computation. Nevertheless, in general iterative methods are more 
-suitable to solve this kind of problem.
+suitable to solve this kind of problem. \\
+
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+    \Input{$\pi$ (policy to evaluate) }
+    \Output{$ V \approx v_\pi$}
+     Initialize an Array $V(s)=0 \forall s \in S^+ $ \;
+     \While{$\Delta \geq \theta$ (small positive number)}{
+      $\Delta \gets 0$ \;
+      \ForEach{$s \in S$}{
+        $v \gets V(s)$ \;
+        $ v(s) = \sum_a \pi(a|s) \sum_{s',r} p(s',r|a, s) \left[ 
+            r + \gamma V(s') 
+        \right] $ \;
+        $ v(s) = \max(|v - V(s)|, \Delta) $ \;
+      }
+     }
+     \caption{Iterative Policy Evaluation}
+\end{algorithm}
 
 % Policy Improvement
 \subsubsection{Policy Improvement}
