@@ -417,7 +417,7 @@ non-stationary setup, tracking the best action over time, but to find the
 best action for a given state, hence associate a given state to its best action.
 
 % DYNAMIC PROGRAMMING
-\subsection{DYNAMIC PROGRAMMING}
+\subsection{Dynamic Programming}
 
 % Policy Evaluation
 \subsubsection{Policy Evaluation}
@@ -441,7 +441,7 @@ Also called the \textit{prediction problem}.
 If the dynamics of the environment are fully known, then \ref{eq:policy-evaluation}
 is a system of $|\mathbb{S}|$ equations in $|\mathbb{S}|$ unknowns and therefore
 a straightforward computation. Nevertheless, in general iterative methods are more 
-suitable to solve this kind of problem. \\
+suitable to solve this kind of problem: \\
 
 \begin{algorithm}[H]
     \SetAlgoLined
@@ -457,7 +457,7 @@ suitable to solve this kind of problem. \\
         $ v(s) = \sum_a \pi(a|s) \sum_{s',r} p(s',r|a, s) \left[ 
             r + \gamma V(s') 
         \right] $ \;
-        $ v(s) = \max(|v - V(s)|, \Delta) $ \;
+        $ \Delta \gets \max(|v - V(s)|, \Delta) $ \;
       }
      }
      \caption{Iterative Policy Evaluation}
