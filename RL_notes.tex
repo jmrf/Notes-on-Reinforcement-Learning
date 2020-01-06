@@ -427,13 +427,13 @@ Also called the \textit{prediction problem}.
 
 \begin{equation}
     \begin{aligned}
-        v_\pi(s) = \mathbb{E_\pi} \left[ 
+        v_\pi(s) &= \mathbb{E_\pi} \left[ 
             R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t = s
-        \right] = \\ 
-        \mathbb{E_\pi} \left[ 
+        \right] \\ 
+        &= \mathbb{E_\pi} \left[ 
             R_{t+1} + \gamma v_\pi(s_{t+1}) | S_t = s
-        \right] = \\
-        \sum_a \pi(a|s) \sum_{s',r} p(s',r|s, a) \left[ r + \gamma v_\pi(s') \right]
+        \right] \\
+        &= \sum_a \pi(a|s) \sum_{s',r} p(s',r|s, a) \left[ r + \gamma v_\pi(s') \right]
     \end{aligned}
     \label{eq:policy-evaluation}
 \end{equation}
@@ -460,11 +460,45 @@ suitable to solve this kind of problem: \\
         $ \Delta \gets \max(|v - V(s)|, \Delta) $ \;
       }
      }
-     \caption{Iterative Policy Evaluation}
-\end{algorithm}
+     \caption{Iterative Policy Evaluation}\end{algorithm}
 
 % Policy Improvement
+
 \subsubsection{Policy Improvement}
+The motivation to do a \textit{policy evaluation} and compute the 
+state-value function is to help in finding a better policy.
+As explained previously, how good is to follow policy $\pi$ from state
+$s$ is given by $V_\pi(s)$.
+
+One way to improve the current policy, is to take an action $a \neq \pi(s)$
+in state $s$ and after following the policy $\pi$ as usual. \\
+
+We can formulate the above as follows:
+
+\begin{align}
+    \begin{aligned}
+        q_\pi(s,a) &= \mathbb{E_\pi} \left[ 
+            R_{t+1} + \gamma v_\pi(s_{t+1}) | S_t=s, A_t=a
+        \right] \\
+        &= \sum_{s',r} p(s',r|s, a) \left[ r + \gamma v_\pi(s') \right]
+    \end{aligned}
+    \label{eq:policy-improvement}
+\end{align}
+
+If \ref{eq:policy-improvement} is greater than $v_\pi(s)$ then we found a better policy. When this holds true, the improved policy is that in which in state $s$
+the new action $a$ is selected. \\
+
+Being $\pi$ and $\pi'$ two deterministic policies, if:
+
+\begin{equation}
+    q(s, \pi'(s)) \geq v_\pi
+\end{equation}
+
+Then policy $\pi'$ must be better, therefore we have that:
+
+\begin{equation}
+    v_\pi'(s) \geq v_\pi(s) \forall s \in \mathbb{S}
+\end{equation}
 
 % Policy Iteration
 \subsubsection{Policy Iteration}
